@@ -213,7 +213,7 @@ namespace LoanTracker.Console
                 System.Console.WriteLine("No loans recorded yet.");
                 return;
             }
-            ConsoleTableWriter.Write(new string[] { "Name", "Outstanding" }, balances.Select(kvp => new string[] { kvp.Key, FormatCurrency(kvp.Value) }).ToList());
+            ConsoleTableWriter.Write(["Name", "Outstanding"], balances.Select(kvp => new string[] { kvp.Key, FormatCurrency(kvp.Value) }).ToList());
         }
         private void RecordRepayment() 
         { 
