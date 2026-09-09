@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="LoanTracker.Console/LoanTracker.Console.csproj" />
+  <Project Path="LoanTracker.Core/LoanTracker.Core.csproj" />
+  <Project Path="LoanTracker.Tests/LoanTracker.Tests.csproj" />
+</Solution>
