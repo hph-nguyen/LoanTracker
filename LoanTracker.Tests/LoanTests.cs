@@ -59,5 +59,23 @@ namespace LoanTracker.Tests
             Assert.True(loan.IsFullyRepaid);
             Assert.Equal(0m, loan.OutstandingAmount);
         }
+
+
+        /// <summary>
+        /// Tests that the Loan constructor throws an ArgumentException when provided with an invalid amount (zero or negative).
+        /// </summary>
+        /// <param name="amount"></param>
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-10)]
+        public void Constructor_InvalidAmount_Throws(decimal amount)
+        {
+            Assert.Throws<ArgumentException>(() =>
+                new Loan(
+                    Guid.NewGuid(),
+                    "Alice",
+                    amount,
+                    DateOnly.FromDateTime(DateTime.Today)));
+        }
     }
 }
