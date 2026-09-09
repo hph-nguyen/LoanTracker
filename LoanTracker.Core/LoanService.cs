@@ -55,14 +55,14 @@ namespace LoanTracker.Core
             return _loanList.AsReadOnly();
         }
 
-        public void UpdateRepayment(Guid loanId, decimal amountRePaid)
+        public void UpdateRepayment(Guid loanId, decimal amountRepaid)
         {
             var loan = _loanList.Find(l => l.Id == loanId);
             if (loan == null)
             {
                 throw new ArgumentException($"No loan found with ID {loanId}", nameof(loanId));
             }
-            loan.UpdateRepayment(amountRePaid);
+            loan.UpdateRepayment(amountRepaid);
             _loanRepository.SaveAll(_loanList);
         }
 

@@ -35,7 +35,7 @@ namespace LoanTracker.Console
                         DeleteLoan();
                         break;
                     case "4":
-                        ListAlloans();
+                        ListAllLoans();
                         break;
                     case "5":
                         RecordRepayment();
@@ -251,7 +251,7 @@ namespace LoanTracker.Console
 
         }
 
-        private void ListAlloans()
+        private void ListAllLoans()
         {
             var loans = _loanService.GetAllLoans();
             PrintLoansTable(loans);
