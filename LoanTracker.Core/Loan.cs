@@ -5,7 +5,7 @@
     /// </summary>
     public class Loan
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
         public string Name { get; private set; }
         public decimal Amount { get; private set; }
         public DateOnly DateLent { get; private set; }
@@ -14,7 +14,7 @@
         public decimal OutstandingAmount => Amount - AmountRepaid;
         public bool IsFullyRepaid => OutstandingAmount <= 0;
 
-        public Loan(Guid id,string name, decimal amount, DateOnly dateLent, decimal amountRePaid = 0m,string? note = null)
+        public Loan(Guid id,string name, decimal amount, DateOnly dateLent, decimal amountRepaid = 0m,string? note = null)
         {
             if(string.IsNullOrWhiteSpace(name))
             {
@@ -24,31 +24,31 @@
             {
                 throw new ArgumentException("Amount must be a positive value.", nameof(amount));
             }
-            if(amountRePaid < 0m || amountRePaid > amount)
+            if(amountRepaid < 0m || amountRepaid > amount)
             {
-                throw new ArgumentException("Amount repaid must be a non-negative value and not exceed the loan amount.", nameof(amountRePaid));
+                throw new ArgumentException("Amount repaid must be a non-negative value and not exceed the loan amount.", nameof(amountRepaid));
             }
             Id = id;
             Name = name;
             Amount = amount;
             DateLent = dateLent;
             Note = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
-            AmountRepaid = amountRePaid;
+            AmountRepaid = amountRepaid;
         }
 
-        public void UpdateRepayment(decimal amountRePaid)
+        public void UpdateRepayment(decimal amountRepaid)
         {
-            if (amountRePaid < 0m || amountRePaid > Amount)
+            if (amountRepaid < 0m || amountRepaid > Amount)
             {
-                throw new ArgumentException("Amount repaid must be a non-negative value and not exceed the loan amount.", nameof(amountRePaid));
+                throw new ArgumentException("Amount repaid must be a non-negative value and not exceed the loan amount.", nameof(amountRepaid));
             }
             
-            if(amountRePaid > OutstandingAmount)
+            if(amountRepaid > OutstandingAmount)
             {
-                throw new InvalidOperationException($"Repayment amount {amountRePaid} exceeds the outstanding loan amount {OutstandingAmount}");
+                throw new InvalidOperationException($"Repayment amount {amountRepaid} exceeds the outstanding loan amount {OutstandingAmount}");
             }
 
-            AmountRepaid += amountRePaid;
+             AmountRepaid += amountRepaid;
         }
 
         /// <summary>

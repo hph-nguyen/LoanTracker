@@ -87,7 +87,7 @@ namespace LoanTracker.Tests
             svc.AddLoan("Ivy", 50m, DateOnly.FromDateTime(DateTime.Today));
             svc.AddLoan("Jack", 20m, DateOnly.FromDateTime(DateTime.Today));
 
-            var result = svc.GetOutstandingBalancedByName();
+            var result = svc.GetOutstandingBalancesByName();
 
             Assert.Equal(2, result.Count);
             Assert.Equal(150m, result["Ivy"]);

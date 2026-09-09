@@ -207,7 +207,7 @@ namespace LoanTracker.Console
 
         private void ShowOutstandingBalances() 
         { 
-            var balances = _loanService.GetOutstandingBalancedByName();
+            var balances = _loanService.GetOutstandingBalancesByName();
             if(balances.Count == 0)
             {
                 System.Console.WriteLine("No loans recorded yet.");
