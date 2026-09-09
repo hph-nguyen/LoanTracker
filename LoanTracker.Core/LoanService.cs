@@ -70,10 +70,10 @@ namespace LoanTracker.Core
         /// Gets the outstanding balance for each unique name in the loan list.
         /// </summary>
         /// <returns></returns>
-        public IReadOnlyDictionary<string, decimal> GetOutStandingBalancedByName()
+        public IReadOnlyDictionary<string, decimal> GetOutstandingBalancedByName()
         {
             return _loanList.GroupBy(loan => loan.Name)
-                            .Select(group => new {group.Key, Outstanding = group.Sum(loan => loan.OutStandingAmount)})
+                            .Select(group => new {group.Key, Outstanding = group.Sum(loan => loan.OutstandingAmount)})
                             .Where(x => x.Outstanding > 0m)
                             .ToDictionary(x => x.Key, x => x.Outstanding);
         }

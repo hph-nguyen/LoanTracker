@@ -74,7 +74,7 @@ namespace LoanTracker.Tests
             svc.UpdateRepayment(loan.Id, 50m);
 
             var stored = svc.GetAllLoans().First(l => l.Id == loan.Id);
-            Assert.Equal(150m, stored.OutStandingAmount);
+            Assert.Equal(150m, stored.OutstandingAmount);
             Assert.NotNull(repo.LastSaved);
         }
 
@@ -87,7 +87,7 @@ namespace LoanTracker.Tests
             svc.AddLoan("Ivy", 50m, DateOnly.FromDateTime(DateTime.Today));
             svc.AddLoan("Jack", 20m, DateOnly.FromDateTime(DateTime.Today));
 
-            var result = svc.GetOutStandingBalancedByName();
+            var result = svc.GetOutstandingBalancedByName();
 
             Assert.Equal(2, result.Count);
             Assert.Equal(150m, result["Ivy"]);

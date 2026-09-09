@@ -6,7 +6,7 @@ namespace LoanTracker.Console
 {
     public class ConsoleTableWriter
     {
-        private const int MaxWidth = 20;
+        private const int MaxWidth = 30;
         public static void Write(string[] headers, IReadOnlyList<string[]> rows)
         {
             // Calculate column widths

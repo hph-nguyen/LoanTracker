@@ -9,10 +9,10 @@
         public string Name { get; private set; }
         public decimal Amount { get; private set; }
         public DateOnly DateLent { get; private set; }
-        public decimal AmountRePaid { get; private set; }
+        public decimal AmountRepaid { get; private set; }
         public string? Note { get; private set; }
-        public decimal OutStandingAmount => Amount - AmountRePaid;
-        public bool IsFullyRepaid => OutStandingAmount <= 0;
+        public decimal OutstandingAmount => Amount - AmountRepaid;
+        public bool IsFullyRepaid => OutstandingAmount <= 0;
 
         public Loan(Guid id,string name, decimal amount, DateOnly dateLent, decimal amountRePaid = 0m,string? note = null)
         {
@@ -33,7 +33,7 @@
             Amount = amount;
             DateLent = dateLent;
             Note = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
-            AmountRePaid = amountRePaid;
+            AmountRepaid = amountRePaid;
         }
 
         public void UpdateRepayment(decimal amountRePaid)
@@ -43,12 +43,12 @@
                 throw new ArgumentException("Amount repaid must be a non-negative value and not exceed the loan amount.", nameof(amountRePaid));
             }
             
-            if(amountRePaid > OutStandingAmount)
+            if(amountRePaid > OutstandingAmount)
             {
-                throw new InvalidOperationException($"Repayment amount {amountRePaid} exceeds the outstanding loan amount {OutStandingAmount}");
+                throw new InvalidOperationException($"Repayment amount {amountRePaid} exceeds the outstanding loan amount {OutstandingAmount}");
             }
 
-            AmountRePaid += amountRePaid;
+            AmountRepaid += amountRePaid;
         }
 
         /// <summary>
@@ -68,9 +68,9 @@
             {
                 throw new ArgumentException("Amount must be a positive value.", nameof(amount));
             }
-            if (AmountRePaid > amount)
+            if (AmountRepaid > amount)
             {
-                throw new InvalidOperationException($"Cannot set loan amount to {amount} as it is less than the amount already repaid {AmountRePaid}");
+                throw new InvalidOperationException($"Cannot set loan amount to {amount} as it is less than the amount already repaid {AmountRepaid}");
             }
             Name = name;
             Amount = amount;

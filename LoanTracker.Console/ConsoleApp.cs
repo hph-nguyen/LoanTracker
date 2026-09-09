@@ -35,13 +35,13 @@ namespace LoanTracker.Console
                         DeleteLoan();
                         break;
                     case "4":
-                        ListAllloans();
+                        ListAlloans();
                         break;
                     case "5":
-                        RecordRepaymernt();
+                        RecordRepayment();
                         break;
                     case "6": 
-                        ShowOutStandingBalances();
+                        ShowOutstandingBalances();
                         break;
                     case "7":
                         running = false;
@@ -72,12 +72,12 @@ namespace LoanTracker.Console
             System.Console.WriteLine(rule);
             System.Console.Write("Choice: "); 
         }
-        private static string formatCurrency(decimal amount)
+        private static string FormatCurrency(decimal amount)
         {
             return amount.ToString("0.00", CultureInfo.InvariantCulture);
         }   
 
-        private static string formatDate(DateOnly date)
+        private static string FormatDate(DateOnly date)
         {
             return date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
         }
@@ -91,18 +91,29 @@ namespace LoanTracker.Console
                 System.Console.WriteLine("Name cannot be empty.");
                 return;
             }
-            System.Console.Write("Amount: ");
-            var amount = System.Console.ReadLine();
-            if(!decimal.TryParse(amount, out var loanAmount))
+
+            decimal loanAmount;
+
+            while (true)
             {
-                System.Console.WriteLine("Invalid amount.");
-                return;
+                System.Console.Write("Amount: ");
+                var amountInput = System.Console.ReadLine();
+
+                if (decimal.TryParse(amountInput, out loanAmount) && loanAmount > 0)
+                    break;
+
+                System.Console.Write("Invalid amount. Please enter a positive number. Re-enter? (y/n): ");
+                var retry = System.Console.ReadLine();
+
+                if (retry?.Trim().ToLower() != "y")
+                    return;
             }
+
             System.Console.Write("Note (optional): ");
             var note = System.Console.ReadLine();
 
             var loan = _loanService.AddLoan(name, loanAmount, DateOnly.FromDateTime(DateTime.Now), note);
-            System.Console.WriteLine($"Added: {loan.Name} borrowed {formatCurrency(loanAmount)} on {formatDate(loan.DateLent)}");
+            System.Console.WriteLine($"Added: {loan.Name} borrowed {FormatCurrency(loanAmount)} on {FormatDate(loan.DateLent)}");
         }
         private void DeleteLoan() 
         {
@@ -121,7 +132,7 @@ namespace LoanTracker.Console
                 return;
             }
             var loanToDelete = loans[selection - 1];
-            System.Console.WriteLine($"Are you sure you want to delete the loan for {loanToDelete.Name} borrowed {formatCurrency(loanToDelete.Amount)} on {formatDate(loanToDelete.DateLent)}? (y/n)");
+            System.Console.WriteLine($"Are you sure you want to delete the loan for {loanToDelete.Name} borrowed {FormatCurrency(loanToDelete.Amount)} on {FormatDate(loanToDelete.DateLent)}? (y/n)");
             var confirmation = System.Console.ReadLine();
             if (confirmation?.Trim().ToLower() == "y")
             {
@@ -153,14 +164,32 @@ namespace LoanTracker.Console
             var loanToEdit = loans[selection - 1];
             System.Console.Write($"Enter new name (current: {loanToEdit.Name}): ");
             var newNameInput = System.Console.ReadLine();
-            var newName = string.IsNullOrEmpty(newNameInput) ? loanToEdit.Name : newNameInput;
-            System.Console.Write($"Enter new amount (current: {formatCurrency(loanToEdit.Amount)}): ");
-            var newAmountInput = System.Console.ReadLine();
-            var newAmount = string.IsNullOrEmpty(newAmountInput) ? loanToEdit.Amount : decimal.Parse(newAmountInput);   
-            if(newAmount <=0)
+            var newName = string.IsNullOrEmpty(newNameInput) ? loanToEdit.Name : newNameInput.Trim();
+
+            decimal newAmount;
+            while (true)
             {
-                System.Console.WriteLine("Amount must be greater than zero.");
-                return;
+                System.Console.Write($"Enter new amount (current: {FormatCurrency(loanToEdit.Amount)}): ");
+                var newAmountInput = System.Console.ReadLine();
+
+                if (string.IsNullOrEmpty(newAmountInput))
+                {
+                    newAmount = loanToEdit.Amount;
+                    break; // Keep old amount
+                }
+                if(decimal.TryParse(newAmountInput, out newAmount) && newAmount > 0)
+                {
+                    break; // Valid new amount
+                }
+                
+                System.Console.WriteLine("Invalid amount. Re-enter? (y/n): ");
+                var retry = System.Console.ReadLine();
+                if (retry?.Trim().ToLower() != "y")
+                {
+                    newAmount = loanToEdit.Amount;
+                    break;
+                }
+
             }
             System.Console.Write($"Enter new note (current: {loanToEdit.Note ?? "none"}): ");
             var newNoteInput = System.Console.ReadLine();
@@ -176,27 +205,17 @@ namespace LoanTracker.Console
             }
         }
 
-        private void ShowOutStandingBalances() 
+        private void ShowOutstandingBalances() 
         { 
-            var loans = _loanService.GetAllLoans();
-            if (loans.Count == 0)
+            var balances = _loanService.GetOutstandingBalancedByName();
+            if(balances.Count == 0)
             {
                 System.Console.WriteLine("No loans recorded yet.");
                 return;
             }
-            var outstandingBalances = new Dictionary<string, decimal>();
-            foreach (var loan in loans)
-            {
-                if (!outstandingBalances.ContainsKey(loan.Name))
-                {
-                    outstandingBalances[loan.Name] = 0m;
-                }
-                outstandingBalances[loan.Name] += loan.OutStandingAmount;
-            }
-            System.Console.WriteLine("Outstanding Balances:");
-            ConsoleTableWriter.Write(new string[] { "Borrower", "Outstanding" }, outstandingBalances.Select(kvp => new string[] { kvp.Key, formatCurrency(kvp.Value) }).ToList());
+            ConsoleTableWriter.Write(new string[] { "Name", "Outstanding" }, balances.Select(kvp => new string[] { kvp.Key, FormatCurrency(kvp.Value) }).ToList());
         }
-        private void RecordRepaymernt() 
+        private void RecordRepayment() 
         { 
             var loans = _loanService.GetAllLoans();
             if (loans.Count == 0)
@@ -205,7 +224,7 @@ namespace LoanTracker.Console
                 return;
             }
             PrintLoansTable(loans);
-            System.Console.WriteLine("Select a loan to record repayment by Id: ");
+            System.Console.Write("Select a loan to record repayment by Id: ");
             var selectionInput = System.Console.ReadLine();
             if (!int.TryParse(selectionInput, out var selection) || selection < 1 || selection > loans.Count)
             {
@@ -213,7 +232,7 @@ namespace LoanTracker.Console
                 return;
             }
             var loan = loans[selection - 1];
-            System.Console.WriteLine($"Enter repayment amount for {loan.Name} (Outstanding: {formatCurrency(loan.OutStandingAmount)}): ");
+            System.Console.Write($"Enter repayment amount for {loan.Name} (Outstanding: {FormatCurrency(loan.OutstandingAmount)}): ");
             var amountInput = System.Console.ReadLine();
             if (!decimal.TryParse(amountInput, out var repaymentAmount) || repaymentAmount <= 0)
             {
@@ -223,7 +242,7 @@ namespace LoanTracker.Console
             try
             {
                 _loanService.UpdateRepayment(loan.Id, repaymentAmount);
-                System.Console.WriteLine($"Recorded repayment of {formatCurrency(repaymentAmount)} for {loan.Name}. New outstanding balance: {formatCurrency(loan.OutStandingAmount - repaymentAmount)}");
+                System.Console.WriteLine($"Recorded repayment of {FormatCurrency(repaymentAmount)} for {loan.Name}. New outstanding balance: {FormatCurrency(loan.OutstandingAmount)}");
             }
             catch (Exception ex)
             {
@@ -232,7 +251,7 @@ namespace LoanTracker.Console
 
         }
 
-        private void ListAllloans()
+        private void ListAlloans()
         {
             var loans = _loanService.GetAllLoans();
             PrintLoansTable(loans);
@@ -249,10 +268,10 @@ namespace LoanTracker.Console
                 {
                     (i + 1).ToString(),
                     loan.Name,
-                    formatDate(loan.DateLent),
-                    formatCurrency(loan.Amount),
-                    formatCurrency(loan.AmountRePaid),
-                    formatCurrency(loan.OutStandingAmount),
+                    FormatDate(loan.DateLent),
+                    FormatCurrency(loan.Amount),
+                    FormatCurrency(loan.AmountRepaid),
+                    FormatCurrency(loan.OutstandingAmount),
                     loan.IsFullyRepaid ? "Repaid" : "Open",
                     loan.Note ?? ""
                 };

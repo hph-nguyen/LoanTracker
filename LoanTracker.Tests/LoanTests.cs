@@ -16,7 +16,7 @@ namespace LoanTracker.Tests
             Assert.Equal(id, loan.Id);
             Assert.Equal("Alice", loan.Name);
             Assert.Equal(100m, loan.Amount);
-            Assert.Equal(100m, loan.OutStandingAmount);
+            Assert.Equal(100m, loan.OutstandingAmount);
             Assert.False(loan.IsFullyRepaid);
         }
 
@@ -31,7 +31,7 @@ namespace LoanTracker.Tests
         {
             var loan = new Loan(Guid.NewGuid(), "Bob", 100m, DateOnly.FromDateTime(DateTime.Today));
             loan.UpdateRepayment(40m);
-            Assert.Equal(60m, loan.OutStandingAmount);
+            Assert.Equal(60m, loan.OutstandingAmount);
 
             Assert.Throws<InvalidOperationException>(() => loan.UpdateRepayment(70m));
         }
@@ -57,7 +57,7 @@ namespace LoanTracker.Tests
             var loan = new Loan(Guid.NewGuid(), "Dan", 50m, DateOnly.FromDateTime(DateTime.Today));
             loan.UpdateRepayment(50m);
             Assert.True(loan.IsFullyRepaid);
-            Assert.Equal(0m, loan.OutStandingAmount);
+            Assert.Equal(0m, loan.OutstandingAmount);
         }
     }
 }
