@@ -19,7 +19,7 @@ namespace LoanTracker.Console
             var running = true;
             while (running)
             {
-                printMenu();
+                PrintMenu();
                 var choice = System.Console.ReadLine();
                 System.Console.WriteLine();
 
@@ -56,7 +56,7 @@ namespace LoanTracker.Console
 
         }
 
-        private static void printMenu()
+        private static void  PrintMenu()
         {
             var rule = new string('=', 42);
             System.Console.WriteLine(rule);
